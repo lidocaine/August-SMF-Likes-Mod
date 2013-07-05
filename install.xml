@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<?xml-stylesheet href="modification.xsl" type="text/xsl"?>
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+  <id>Lidocaine:AugustSMFLikesMod</id>
+  <version>0.1.0</version>
+  <file name="$sourcedir/Admin.php">
+    <operation>
+      <search position="replace"><![CDATA[				'serversettings' => array(
+					'label' => $txt['admin_server_settings'],
+					'file' => 'ManageServer.php',
+					'function' => 'ModifySettings',
+					'icon' => 'server.gif',
+					'subsections' => array(
+						'general' => array($txt['general_settings']),
+						'database' => array($txt['database_paths_settings']),
+						'cookie' => array($txt['cookies_sessions_settings']),
+						'cache' => array($txt['caching_settings']),
+						'loads' => array($txt['load_balancing_settings']),
+					),
+				),
+]]></search>
+  		<add><![CDATA[				'serversettings' => array(
+					'label' => $txt['admin_server_settings'],
+					'file' => 'ManageServer.php',
+					'function' => 'ModifySettings',
+					'icon' => 'server.gif',
+					'subsections' => array(
+						'general' => array($txt['general_settings']),
+						'database' => array($txt['database_paths_settings']),
+						'cookie' => array($txt['cookies_sessions_settings']),
+						'cache' => array($txt['caching_settings']),
+						'loads' => array($txt['load_balancing_settings']),
+					),
+				),
+				'likes' => array(
+				  'label' => $txt['likes'],
+				  'file' => 'Likes.php',
+				  'function' => 'LikesAdmin',
+				  'custom_url' => $scripturl . '?action=admin;area=likes;sa=settings',
+				  'icon' => 'heart.png',
+				),
+]]></add>
+    </operation>
+  </file>
+
+  <file name="$sourcedir/Display.php">
+    <operation>
+      <search position="replace"><![CDATA[smileys_enabled, poster_name, poster_email, approved,]]></search>
+      <add><![CDATA[smileys_enabled, poster_name, poster_email, approved, likes,]]></add>
+    </operation>
+    <operation>
+      <search position="replace"><![CDATA[	// Compose the memory eat- I mean message array.
+	$output = array(
+		'attachment' => loadAttachmentContext($message['id_msg']),
+]]></search>
+      <add><![CDATA[	// Compose the memory eat- I mean message array.
+	$output = array(
+    	'can_like' => allowedTo('can_like') && $message['id_member'] != $user_info['id'], // user can like post if he has permission and it's not his own post
+		'likes' => $message['likes'], // add number of likes to output array
+		'attachment' => loadAttachmentContext($message['id_msg']),
+]]></add>
+    </operation>
+  </file>
+
+  <file name="$sourcedir/ManagePermissions.php">
+    <operation>
+      <search position="before"><![CDATA['modify' => array(true, 'post', 'modify', 'moderate'),]]></search>
+      <add><![CDATA['can_like' => array(false, 'post', 'participate'),]]></add>
+    </operation>
+    <operation>
+      <search position="before"><![CDATA[		'report_any',
+		'send_topic',
+]]></search>
+      <add><![CDATA[		'can_like',
+]]></add>
+    </operation>
+    <operation>
+      <search position="before"><![CDATA[$context['non_guest_permissions'] = array(]]></search>
+      <add><![CDATA['can_like',]]></add>
+    </operation>
+  </file>
+
+  <file name="$themedir/Display.template.php">
+    <operation>
+      <search position="before"><![CDATA[		echo '
+								<div class="inner" id="msg_', $message['id'], '"', '>', $message['body'], '</div>
+							</div>';
+]]></search>
+      <add><![CDATA[		// Display total number of likes with link
+		if(!empty($modSettings['likes_show']))
+		{
+				global $settings;
+				echo '
+						  <div class="likes_box">
+						  (' . $message['likes'] . ')';
+		
+			  // If we can like the post, show the damn link!
+			  // TODO: Show a disabled like button on posts we can't like (e.g. our own posts)
+			  if ($message['can_like'])
+			  {    
+						echo '
+										<a href="', $scripturl, '?action=like;t=', $context['current_topic'], ';msg=', $message['id'], '"><img class="like_button" id="like_button_', $message['id'], '" src="', $settings['images_url'], '/heart2.png" alt="', $txt['likes_like_post'], '" /></a>';
+			  }
+				  echo '  
+						  </div>';
+		}
+]]></add>
+    </operation>
+  </file>
+</modification>

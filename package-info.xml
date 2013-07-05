@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="package-info.xsl" type="text/xsl"?>
+<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+<package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
+	<id>Lidocaine:AugustSMFLikesMod</id>
+	<name>August SMF Likes Mod</name>
+	<type>modification</type>
+	<version>0.1.0</version>
+	
+	<install for="2.0.4">
+		<readme type="file">readme.txt</readme>
+		
+		<code>db_init.php</code>
+		<modification type="file">install.xml</modification>
+		<require-file name="Likes.php" destination="$sourcedir" />
+    <require-file name="Subs-Likes.php" destination="$sourcedir" />
+		<require-file name="Likes.english.php" destination="$languagedir" />
+		<require-file name="heart.png" destination="$imagesdir/admin" />
+		<require-file name="heart2.png" destination="$imagesdir" />
+	</install>
+	
+	<uninstall for="2.0.4">
+		<modification type="file" reverse="true">install.xml</modification>
+		
+		<remove-file name="$sourcedir/Likes.php" />
+    <remove-file name="$sourcedir/Subs-Likes.php" />
+		<remove-file name="$languagedir/Likes.english.php" />
+		<remove-file name="$imagesdir/admin/heart.png" />
+		<remove-file name="$imagesdir/heart2.png" />
+	</uninstall>
+</package-info>
